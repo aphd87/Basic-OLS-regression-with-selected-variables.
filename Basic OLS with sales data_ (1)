@@ -1,0 +1,503 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "74ae1cf2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import operator\n",
+    "import matplotlib.pyplot as plot\n",
+    "%matplotlib inline\n",
+    "\n",
+    "import seaborn as sns\n",
+    "sns.set(style=\"white\", color_codes=True)\n",
+    "sns.set(font_scale=1.5)\n",
+    "\n",
+    "import matplotlib.cm as cm\n",
+    "\n",
+    "from mpl_toolkits import mplot3d\n",
+    "from mpl_toolkits.mplot3d import Axes3D\n",
+    "\n",
+    "from sklearn.linear_model import LinearRegression\n",
+    "import statsmodels.formula.api as smf\n",
+    "import statsmodels.api as sm\n",
+    "\n",
+    "from sklearn import metrics\n",
+    "\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "\n",
+    "df = pd.read_csv(\"Advertising.csv\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "ac421c47",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(200, 5)"
+      ]
+     },
+     "execution_count": 23,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "2f364e93",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Unnamed: 0</th>\n",
+       "      <th>TV</th>\n",
+       "      <th>Radio</th>\n",
+       "      <th>Newspaper</th>\n",
+       "      <th>Sales</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1</td>\n",
+       "      <td>230.1</td>\n",
+       "      <td>37.8</td>\n",
+       "      <td>69.2</td>\n",
+       "      <td>22.1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2</td>\n",
+       "      <td>44.5</td>\n",
+       "      <td>39.3</td>\n",
+       "      <td>45.1</td>\n",
+       "      <td>10.4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>3</td>\n",
+       "      <td>17.2</td>\n",
+       "      <td>45.9</td>\n",
+       "      <td>69.3</td>\n",
+       "      <td>9.3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>4</td>\n",
+       "      <td>151.5</td>\n",
+       "      <td>41.3</td>\n",
+       "      <td>58.5</td>\n",
+       "      <td>18.5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>5</td>\n",
+       "      <td>180.8</td>\n",
+       "      <td>10.8</td>\n",
+       "      <td>58.4</td>\n",
+       "      <td>12.9</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Unnamed: 0     TV  Radio  Newspaper  Sales\n",
+       "0           1  230.1   37.8       69.2   22.1\n",
+       "1           2   44.5   39.3       45.1   10.4\n",
+       "2           3   17.2   45.9       69.3    9.3\n",
+       "3           4  151.5   41.3       58.5   18.5\n",
+       "4           5  180.8   10.8       58.4   12.9"
+      ]
+     },
+     "execution_count": 24,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.head(5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "bfdb60ef",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Unnamed: 0</th>\n",
+       "      <th>TV</th>\n",
+       "      <th>Radio</th>\n",
+       "      <th>Newspaper</th>\n",
+       "      <th>Sales</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>200.000000</td>\n",
+       "      <td>200.000000</td>\n",
+       "      <td>200.000000</td>\n",
+       "      <td>200.000000</td>\n",
+       "      <td>200.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>100.500000</td>\n",
+       "      <td>147.042500</td>\n",
+       "      <td>23.264000</td>\n",
+       "      <td>30.554000</td>\n",
+       "      <td>14.022500</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>57.879185</td>\n",
+       "      <td>85.854236</td>\n",
+       "      <td>14.846809</td>\n",
+       "      <td>21.778621</td>\n",
+       "      <td>5.217457</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>0.700000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.300000</td>\n",
+       "      <td>1.600000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>50.750000</td>\n",
+       "      <td>74.375000</td>\n",
+       "      <td>9.975000</td>\n",
+       "      <td>12.750000</td>\n",
+       "      <td>10.375000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>100.500000</td>\n",
+       "      <td>149.750000</td>\n",
+       "      <td>22.900000</td>\n",
+       "      <td>25.750000</td>\n",
+       "      <td>12.900000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>150.250000</td>\n",
+       "      <td>218.825000</td>\n",
+       "      <td>36.525000</td>\n",
+       "      <td>45.100000</td>\n",
+       "      <td>17.400000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>200.000000</td>\n",
+       "      <td>296.400000</td>\n",
+       "      <td>49.600000</td>\n",
+       "      <td>114.000000</td>\n",
+       "      <td>27.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       Unnamed: 0          TV       Radio   Newspaper       Sales\n",
+       "count  200.000000  200.000000  200.000000  200.000000  200.000000\n",
+       "mean   100.500000  147.042500   23.264000   30.554000   14.022500\n",
+       "std     57.879185   85.854236   14.846809   21.778621    5.217457\n",
+       "min      1.000000    0.700000    0.000000    0.300000    1.600000\n",
+       "25%     50.750000   74.375000    9.975000   12.750000   10.375000\n",
+       "50%    100.500000  149.750000   22.900000   25.750000   12.900000\n",
+       "75%    150.250000  218.825000   36.525000   45.100000   17.400000\n",
+       "max    200.000000  296.400000   49.600000  114.000000   27.000000"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "9b0fdbc6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#formula based stats model \n",
+    "model = smf.ols(formula='Sales ~ + Radio + TV', data=df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "74c37387",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "results = model.fit()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "8651a3d8",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Intercept    2.921100\n",
+       "Radio        0.187994\n",
+       "TV           0.045755\n",
+       "dtype: float64"
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "results.params"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "11ca8304",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "                                 OLS Regression Results                                \n",
+      "=======================================================================================\n",
+      "Dep. Variable:                  Sales   R-squared (uncentered):                   0.982\n",
+      "Model:                            OLS   Adj. R-squared (uncentered):              0.982\n",
+      "Method:                 Least Squares   F-statistic:                              3566.\n",
+      "Date:                Tue, 09 Aug 2022   Prob (F-statistic):                   2.43e-171\n",
+      "Time:                        10:02:44   Log-Likelihood:                         -423.54\n",
+      "No. Observations:                 200   AIC:                                      853.1\n",
+      "Df Residuals:                     197   BIC:                                      863.0\n",
+      "Df Model:                           3                                                  \n",
+      "Covariance Type:            nonrobust                                                  \n",
+      "==============================================================================\n",
+      "                 coef    std err          t      P>|t|      [0.025      0.975]\n",
+      "------------------------------------------------------------------------------\n",
+      "TV             0.0538      0.001     40.507      0.000       0.051       0.056\n",
+      "Radio          0.2222      0.009     23.595      0.000       0.204       0.241\n",
+      "Newspaper      0.0168      0.007      2.517      0.013       0.004       0.030\n",
+      "==============================================================================\n",
+      "Omnibus:                        5.982   Durbin-Watson:                   2.038\n",
+      "Prob(Omnibus):                  0.050   Jarque-Bera (JB):                7.039\n",
+      "Skew:                          -0.232   Prob(JB):                       0.0296\n",
+      "Kurtosis:                       3.794   Cond. No.                         12.6\n",
+      "==============================================================================\n",
+      "\n",
+      "Notes:\n",
+      "[1] R² is computed without centering (uncentered) since the model does not contain a constant.\n",
+      "[2] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#sm model\n",
+    "\n",
+    "x = df[['TV', 'Radio','Newspaper']]\n",
+    "sm.add_constant(x)\n",
+    "\n",
+    "y=df['Sales']\n",
+    "\n",
+    "olsmod = sm.OLS(y,x)\n",
+    "olsres = olsmod.fit()\n",
+    "print(olsres.summary())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "dd35d51f",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Unnamed: 0</th>\n",
+       "      <th>TV</th>\n",
+       "      <th>Radio</th>\n",
+       "      <th>Newspaper</th>\n",
+       "      <th>Sales</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1</td>\n",
+       "      <td>230.1</td>\n",
+       "      <td>37.8</td>\n",
+       "      <td>69.2</td>\n",
+       "      <td>22.1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2</td>\n",
+       "      <td>44.5</td>\n",
+       "      <td>39.3</td>\n",
+       "      <td>45.1</td>\n",
+       "      <td>10.4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>3</td>\n",
+       "      <td>17.2</td>\n",
+       "      <td>45.9</td>\n",
+       "      <td>69.3</td>\n",
+       "      <td>9.3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>4</td>\n",
+       "      <td>151.5</td>\n",
+       "      <td>41.3</td>\n",
+       "      <td>58.5</td>\n",
+       "      <td>18.5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>5</td>\n",
+       "      <td>180.8</td>\n",
+       "      <td>10.8</td>\n",
+       "      <td>58.4</td>\n",
+       "      <td>12.9</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Unnamed: 0     TV  Radio  Newspaper  Sales\n",
+       "0           1  230.1   37.8       69.2   22.1\n",
+       "1           2   44.5   39.3       45.1   10.4\n",
+       "2           3   17.2   45.9       69.3    9.3\n",
+       "3           4  151.5   41.3       58.5   18.5\n",
+       "4           5  180.8   10.8       58.4   12.9"
+      ]
+     },
+     "execution_count": 40,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e05047b6",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
